@@ -67,9 +67,9 @@ begin
 declare @total_Problem decimal;
 declare @Resolve decimal;
 declare @Not_Resolve decimal;
-
-set @total_Problem = (select CONVERT(decimal,count(Resolved)) from Call_Data
-group by Resolved);
+declare @exp1 decimal;
+declare @exp2 decimal;
+set @total_Problem = (select CONVERT(decimal,count(Resolved)) from Call_Data);
 
 set @Resolve = (
 select  CONVERT(decimal,count(Resolved))  from Call_Data
@@ -81,10 +81,22 @@ select   CONVERT(decimal,count(Resolved))  from Call_Data
 where  Resolved = 'No'
 group by Resolved);
 
-select (@Resolve / @total_Problem) *100 as 'Percent Total Resolve Problems' ,
-(@Not_Resolve / @total_Problem) *100 as 'Percent Total Not Resolve Problems' 
+select ROUND(((@Resolve / @total_Problem)*100),2 ) ,  ROUND(((@Not_Resolve / @total_Problem)*100),2 ) 
 end
 
 drop Procedure Avg_Resolved
 
 exec Avg_Resolved;
+
+select count(Resolved) from Call_Data 
+
+--'Percent Total Resolve Problems'  as 'Percent Total Not Resolve Problems' 
+
+
+-- [Satisfaction Rating]
+select [Satisfaction rating] , count([Satisfaction rating]) from Call_Data 
+group by [Satisfaction rating]
+order by 1;
+
+
+select * from Call_Data;
