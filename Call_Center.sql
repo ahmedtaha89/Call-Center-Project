@@ -100,3 +100,117 @@ order by 1;
 
 
 select * from Call_Data;
+
+-- Number Of Call Per Day
+select [Day Name] ,  COUNT([Day Name]) as Count_Days from Call_Data
+group by [Day Name]
+order by 1 asc ;
+
+select  [Month Name] ,  COUNT([Month Name]) as Count_Month from Call_Data
+group by [Month Name]
+order by 1 asc ;
+
+
+-- -- Number Of Calls Per Time Day
+select  [Call Time] , COUNT([Call Time]) as Count_Time from Call_Data
+group by [Call Time]
+order by 1 asc ;
+
+-- if condition 
+declare @count int;
+set @count = (select COUNT([Call Time]) as Count_Time from Call_Data)
+if  @count >= 5000
+begin 
+	select  [Call Time] , COUNT([Call Time]) as Count_Time from Call_Data
+	group by [Call Time]
+	order by 1 asc ;
+        PRINT 'Great! Number Of Calls Per Time Day is greater than 5000';
+end
+
+
+else 
+
+	begin
+		  PRINT 'Number Of Calls Per Time Day  did not reach 5000';
+	end
+
+
+------------------------------------------------
+
+/* Beginners (Basics) */ 
+
+--1 select 
+--2 update 
+--3 delete 
+--4 where
+--5 order by
+--6 group by
+--7 distinct 
+--8 Top 
+--9 SubQuery
+--10 operation (> , < , = , >= , <= , <> , And , OR , Betweet  and , in , Alias)
+--11 Methods (Upper , Lower , Concat , Trim )
+--12 alter
+
+
+-- Select (To Retrieve Data From Tabel)
+select  [Call Id] , Topic , Resolved from Call_Data;
+
+-- Where Condtion (search condition to filter rows)
+select  [Call Id] , Topic , Resolved from Call_Data
+where Resolved = 'Yes';
+
+-- update (To modify existing data in a table)
+update Call_Data
+set Resolved = 'No'
+where [Call Id] = 'ID0898';
+
+-- Alter ( remove one or more columns from existing table)
+alter table Call_Data
+drop column F17 , F18 ;
+
+ALTER TABLE Call_Data
+ALTER COLUMN date date;
+
+
+-- order by (The only way for you to guarantee that the rows in the result set are sorted)
+select  [Call Id] , Topic , Resolved from Call_Data
+where Resolved = 'Yes'
+order by 2;
+
+-- group by (clause allows you to arrange the rows of a query in groups.)
+select   Resolved ,COUNT(Resolved) from Call_Data
+where Resolved = 'Yes'
+group by Resolved
+order by 2;
+
+-- distinct (get only distinct values in a specified column of a table)
+select distinct(Topic) from Call_Data;
+
+
+-- Top (N) (allows you to limit the number of rows or percentage of rows returned in a query result set.)
+select top 5 * from Call_Data;
+
+-- Operation  (And / OR)
+select  [Call Id] , Topic , Resolved from Call_Data
+where Resolved = 'Yes' and Topic Like  'A%' or Topic Like '%d'
+order by 2;
+
+
+-- SubQuery (uses the values of the outer query.)
+select  [Call Id] , Topic , Resolved from Call_Data
+where Resolved  =
+(Select Resolved from Call_Data
+where [Call Id] = 'ID0930')
+order by 2;
+
+
+-- Methods 
+/*
+Cast( var as data_type)
+Convert(data_type , var)
+Trim -> «“«·Â «·„”«›«  «·“«∆œÂ 
+*/
+
+
+Select UPPER(Agent) , LOWER([Month Name]) ,CONCAT([Month Name],'-',[Day Name]) from Call_Data;
