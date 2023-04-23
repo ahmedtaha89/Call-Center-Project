@@ -212,5 +212,4 @@ Convert(data_type , var)
 Trim -> «“«·Â «·„”«›«  «·“«∆œÂ 
 */
 
-
 Select UPPER(Agent) , LOWER([Month Name]) ,CONCAT([Month Name],'-',[Day Name]) from Call_Data;
