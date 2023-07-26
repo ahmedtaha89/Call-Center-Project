@@ -2,143 +2,170 @@
 Project Name: Call Center
 Data Set: https://www.mediafire.com/file/em7bnwhmf31o73u/01_Call-Center-Dataset.xlsx/file?dkey=xyvbhmulasf&r=621
 */
+CREATE DATABASE Call_Center;
 
-create database Call_Center;
-use Call_Center;
-select * from Call_Data;
+USE Call_Center;
 
+SELECT *
+FROM Call_Data;
 
 -- Procedure For Percent Answered_call
-Create procedure  Answered_call
-as
-begin
--- Total Call
-Declare @Total_Call as  DECIMAL ;
-Set @Total_Call = (
-select Count([Answered (Y/N)]) from Call_Data);
+CREATE PROCEDURE Answered_call
+AS
+BEGIN
+	-- Total Call
+	DECLARE @Total_Call AS DECIMAL;
 
--- Number  Answered call
-Declare @Total_Answered_Call as  DECIMAL ;
-set @Total_Answered_Call = (
-select Count([Answered (Y/N)]) as 'Total Answered' from Call_Data
-where [Answered (Y/N)] = 'Yes');
+	SET @Total_Call = (
+			SELECT Count([Answered (Y/N)])
+			FROM Call_Data
+			);
 
--- Number Not Answered call
-Declare @Total_Not_Answered_Call as  DECIMAL;
-Set @Total_Not_Answered_Call = (
-select Count([Answered (Y/N)]) as 'Total Not Answered'  from Call_Data
-where [Answered (Y/N)] = 'No');
+	-- Number  Answered call
+	DECLARE @Total_Answered_Call AS DECIMAL;
 
-select @Total_Answered_Call as 'Total Answered Call', @Total_Not_Answered_Call as 'Total Not Answered Call' , ((@Total_Answered_Call/@Total_Call) *100) as 'Percent Total Answered Call' , 
-((@Total_Not_Answered_Call/@Total_Call) *100) as'Percent Total Not Answered Call' ;
-end
+	SET @Total_Answered_Call = (
+			SELECT Count([Answered (Y/N)]) AS 'Total Answered'
+			FROM Call_Data
+			WHERE [Answered (Y/N)] = 'Yes'
+			);
 
-drop procedure  Answered_call;
+	-- Number Not Answered call
+	DECLARE @Total_Not_Answered_Call AS DECIMAL;
 
+	SET @Total_Not_Answered_Call = (
+			SELECT Count([Answered (Y/N)]) AS 'Total Not Answered'
+			FROM Call_Data
+			WHERE [Answered (Y/N)] = 'No'
+			);
+
+	SELECT @Total_Answered_Call AS 'Total Answered Call'
+		,@Total_Not_Answered_Call AS 'Total Not Answered Call'
+		,((@Total_Answered_Call / @Total_Call) * 100) AS 'Percent Total Answered Call'
+		,((@Total_Not_Answered_Call / @Total_Call) * 100) AS 'Percent Total Not Answered Call';
+END
+
+DROP PROCEDURE Answered_call;
 
 -- Execute Procedure to Retrieve Percent Answered Call
-exec  Answered_call;
-
+EXEC Answered_call;
 
 -- Topic
-select Topic , count(Topic) as 'Number Of Call Per Topic'  from Call_Data
-group by Topic
-order by 2 desc;
-
+SELECT Topic
+	,count(Topic) AS 'Number Of Call Per Topic'
+FROM Call_Data
+GROUP BY Topic
+ORDER BY 2 DESC;
 
 -- Avg Speed Of Answer
-select ROUND(AVG([Speed of answer in seconds]),2) as 'Avrge Speed Of Answer In Seconds' from Call_Data;
-
+SELECT ROUND(AVG([Speed of answer in seconds]), 2) AS 'Avrge Speed Of Answer In Seconds'
+FROM Call_Data;
 
 -- Number Of Call Time (AM , PM)
-select [Call Time] , count([Call Time]) from Call_Data
-group by [Call Time]
-order by 2 desc;
+SELECT [Call Time]
+	,count([Call Time])
+FROM Call_Data
+GROUP BY [Call Time]
+ORDER BY 2 DESC;
 
+SELECT Resolved
+	,count(Resolved)
+FROM Call_Data
+GROUP BY Resolved;
 
-select Resolved , count(Resolved) from Call_Data
-group by Resolved; 
+CREATE PROCEDURE Avg_Resolved
+AS
+BEGIN
+	DECLARE @total_Problem DECIMAL;
+	DECLARE @Resolve DECIMAL;
+	DECLARE @Not_Resolve DECIMAL;
+	DECLARE @exp1 DECIMAL;
+	DECLARE @exp2 DECIMAL;
 
+	SET @total_Problem = (
+			SELECT CONVERT(DECIMAL, count(Resolved))
+			FROM Call_Data
+			);
+	SET @Resolve = (
+			SELECT CONVERT(DECIMAL, count(Resolved))
+			FROM Call_Data
+			WHERE Resolved = 'Yes'
+			GROUP BY Resolved
+			);
+	SET @Not_Resolve = (
+			SELECT CONVERT(DECIMAL, count(Resolved))
+			FROM Call_Data
+			WHERE Resolved = 'No'
+			GROUP BY Resolved
+			);
 
+	SELECT ROUND(((@Resolve / @total_Problem) * 100), 2)
+		,ROUND(((@Not_Resolve / @total_Problem) * 100), 2)
+END
 
-Create Procedure Avg_Resolved
-as 
-begin
-declare @total_Problem decimal;
-declare @Resolve decimal;
-declare @Not_Resolve decimal;
-declare @exp1 decimal;
-declare @exp2 decimal;
-set @total_Problem = (select CONVERT(decimal,count(Resolved)) from Call_Data);
+DROP PROCEDURE Avg_Resolved
 
-set @Resolve = (
-select  CONVERT(decimal,count(Resolved))  from Call_Data
-where  Resolved = 'Yes'
-group by Resolved);
+EXEC Avg_Resolved;
 
-set @Not_Resolve = (
-select   CONVERT(decimal,count(Resolved))  from Call_Data
-where  Resolved = 'No'
-group by Resolved);
-
-select ROUND(((@Resolve / @total_Problem)*100),2 ) ,  ROUND(((@Not_Resolve / @total_Problem)*100),2 ) 
-end
-
-drop Procedure Avg_Resolved
-
-exec Avg_Resolved;
-
-select count(Resolved) from Call_Data 
+SELECT count(Resolved)
+FROM Call_Data
 
 --'Percent Total Resolve Problems'  as 'Percent Total Not Resolve Problems' 
-
-
 -- [Satisfaction Rating]
-select [Satisfaction rating] , count([Satisfaction rating]) from Call_Data 
-group by [Satisfaction rating]
-order by 1;
+SELECT [Satisfaction rating]
+	,count([Satisfaction rating])
+FROM Call_Data
+GROUP BY [Satisfaction rating]
+ORDER BY 1;
 
-
-select * from Call_Data;
+SELECT *
+FROM Call_Data;
 
 -- Number Of Call Per Day
-select [Day Name] ,  COUNT([Day Name]) as Count_Days from Call_Data
-group by [Day Name]
-order by 1 asc ;
+SELECT [Day Name]
+	,COUNT([Day Name]) AS Count_Days
+FROM Call_Data
+GROUP BY [Day Name]
+ORDER BY 1 ASC;
 
-select  [Month Name] ,  COUNT([Month Name]) as Count_Month from Call_Data
-group by [Month Name]
-order by 1 asc ;
-
+SELECT [Month Name]
+	,COUNT([Month Name]) AS Count_Month
+FROM Call_Data
+GROUP BY [Month Name]
+ORDER BY 1 ASC;
 
 -- -- Number Of Calls Per Time Day
-select  [Call Time] , COUNT([Call Time]) as Count_Time from Call_Data
-group by [Call Time]
-order by 1 asc ;
+SELECT [Call Time]
+	,COUNT([Call Time]) AS Count_Time
+FROM Call_Data
+GROUP BY [Call Time]
+ORDER BY 1 ASC;
 
 -- if condition 
-declare @count int;
-set @count = (select COUNT([Call Time]) as Count_Time from Call_Data)
-if  @count >= 5000
-begin 
-	select  [Call Time] , COUNT([Call Time]) as Count_Time from Call_Data
-	group by [Call Time]
-	order by 1 asc ;
-        PRINT 'Great! Number Of Calls Per Time Day is greater than 5000';
-end
+DECLARE @count INT;
 
+SET @count = (
+		SELECT COUNT([Call Time]) AS Count_Time
+		FROM Call_Data
+		)
 
-else 
+IF @count >= 5000
+BEGIN
+	SELECT [Call Time]
+		,COUNT([Call Time]) AS Count_Time
+	FROM Call_Data
+	GROUP BY [Call Time]
+	ORDER BY 1 ASC;
 
-	begin
-		  PRINT 'Number Of Calls Per Time Day  did not reach 5000';
-	end
-
+	PRINT 'Great! Number Of Calls Per Time Day is greater than 5000';
+END
+ELSE
+BEGIN
+	PRINT 'Number Of Calls Per Time Day  did not reach 5000';
+END
 
 ------------------------------------------------
-
-/* Beginners (Basics) */ 
-
+/* Beginners (Basics) */
 --1 select 
 --2 update 
 --3 delete 
@@ -151,59 +178,79 @@ else
 --10 operation (> , < , = , >= , <= , <> , And , OR , Betweet  and , in , Alias)
 --11 Methods (Upper , Lower , Concat , Trim )
 --12 alter
-
-
 -- Select (To Retrieve Data From Tabel)
-select  [Call Id] , Topic , Resolved from Call_Data;
+SELECT [Call Id]
+	,Topic
+	,Resolved
+FROM Call_Data;
 
 -- Where Condtion (search condition to filter rows)
-select  [Call Id] , Topic , Resolved from Call_Data
-where Resolved = 'Yes';
+SELECT [Call Id]
+	,Topic
+	,Resolved
+FROM Call_Data
+WHERE Resolved = 'Yes';
 
 -- update (To modify existing data in a table)
-update Call_Data
-set Resolved = 'No'
-where [Call Id] = 'ID0898';
+UPDATE Call_Data
+SET Resolved = 'No'
+WHERE [Call Id] = 'ID0898';
 
 -- Alter ( remove one or more columns from existing table)
-alter table Call_Data
-drop column F17 , F18 ;
+ALTER TABLE Call_Data
+
+DROP COLUMN F17
+	,F18;
 
 ALTER TABLE Call_Data
-ALTER COLUMN date date;
 
+ALTER COLUMN DATE DATE;
 
 -- order by (The only way for you to guarantee that the rows in the result set are sorted)
-select  [Call Id] , Topic , Resolved from Call_Data
-where Resolved = 'Yes'
-order by 2;
+SELECT [Call Id]
+	,Topic
+	,Resolved
+FROM Call_Data
+WHERE Resolved = 'Yes'
+ORDER BY 2;
 
 -- group by (clause allows you to arrange the rows of a query in groups.)
-select   Resolved ,COUNT(Resolved) from Call_Data
-where Resolved = 'Yes'
-group by Resolved
-order by 2;
+SELECT Resolved
+	,COUNT(Resolved)
+FROM Call_Data
+WHERE Resolved = 'Yes'
+GROUP BY Resolved
+ORDER BY 2;
 
 -- distinct (get only distinct values in a specified column of a table)
-select distinct(Topic) from Call_Data;
-
+SELECT DISTINCT (Topic)
+FROM Call_Data;
 
 -- Top (N) (allows you to limit the number of rows or percentage of rows returned in a query result set.)
-select top 5 * from Call_Data;
+SELECT TOP 5 *
+FROM Call_Data;
 
 -- Operation  (And / OR)
-select  [Call Id] , Topic , Resolved from Call_Data
-where Resolved = 'Yes' and Topic Like  'A%' or Topic Like '%d'
-order by 2;
-
+SELECT [Call Id]
+	,Topic
+	,Resolved
+FROM Call_Data
+WHERE Resolved = 'Yes'
+	AND Topic LIKE 'A%'
+	OR Topic LIKE '%d'
+ORDER BY 2;
 
 -- SubQuery (uses the values of the outer query.)
-select  [Call Id] , Topic , Resolved from Call_Data
-where Resolved  =
-(Select Resolved from Call_Data
-where [Call Id] = 'ID0930')
-order by 2;
-
+SELECT [Call Id]
+	,Topic
+	,Resolved
+FROM Call_Data
+WHERE Resolved = (
+		SELECT Resolved
+		FROM Call_Data
+		WHERE [Call Id] = 'ID0930'
+		)
+ORDER BY 2;
 
 -- Methods 
 /*
@@ -211,5 +258,11 @@ Cast( var as data_type)
 Convert(data_type , var)
 Trim -> «“«·Â «·„”«›«  «·“«∆œÂ 
 */
-
-Select UPPER(Agent) , LOWER([Month Name]) ,CONCAT([Month Name],'-',[Day Name]) from Call_Data;
+SELECT UPPER(Agent)
+	,LOWER([Month Name])
+	,CONCAT (
+		[Month Name]
+		,'-'
+		,[Day Name]
+		)
+FROM Call_Data;
