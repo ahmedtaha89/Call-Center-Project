@@ -2,7 +2,7 @@ Sure, here's a README template for your Call Center Project repository:
 
 # Call Center Project
 
-![Call Center Project Logo](https://github.com/ahmedtaha89/Call-Center-Project/raw/main/static/img/logo.png)
+![Call Center Project Logo](logo.png)
 
 The Call Center Project is a comprehensive solution designed to streamline call center operations and improve customer service. This open-source web application offers tools for managing customer interactions, tracking issues, and optimizing support processes.
 
